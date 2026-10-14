@@ -1,7 +1,7 @@
 # Portal Arcanjo SA - CP05
 # Imagem base enxuta: nginx sobre Alpine (menor superficie de ataque).
 # Tag fixada de proposito (nao usar :latest) para build reproduzivel.
-FROM nginx:1.30-alpine
+FROM nginx:1.27-alpine
 
 LABEL org.opencontainers.image.title="Portal Arcanjo SA - CP05" \
       org.opencontainers.image.description="Site do CP05 (pipeline DevSecOps) servido por nginx" \
