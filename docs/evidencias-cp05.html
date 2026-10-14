@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>CP04 — Evidências — RM 550788</title>
+<style>
+  :root { --accent: #e6155f; --ink: #14141a; --muted: #6b6b78; --line: #d9d9e0; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--ink);
+    background: #f4f4f6;
+    line-height: 1.55;
+  }
+  .page {
+    background: #fff;
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 40px 48px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  }
+
+  /* ---------- capa ---------- */
+  .cover { text-align: center; padding-top: 70px; padding-bottom: 70px; }
+  .cover .kicker {
+    color: var(--accent); font-weight: 800; letter-spacing: 4px;
+    text-transform: uppercase; font-size: 13px;
+  }
+  .cover h1 { font-size: 34px; margin: 12px 0 8px; }
+  .cover h2 { font-size: 18px; font-weight: 500; color: var(--muted); margin: 0 0 40px; }
+  .cover table { margin: 0 auto; border-collapse: collapse; font-size: 16px; }
+  .cover td { padding: 6px 14px; text-align: left; }
+  .cover td.k { color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: 1.5px; }
+
+  h2.block {
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 6px;
+    margin: 0 0 20px;
+  }
+
+  /* ---------- evidências ---------- */
+  h3.ev {
+    font-size: 18px;
+    border-left: 5px solid var(--accent);
+    padding-left: 12px;
+    margin: 0 0 4px;
+  }
+  .ev-num { color: var(--accent); font-weight: 800; }
+  p.cap { color: var(--muted); margin: 0 0 12px; padding-left: 17px; font-size: 14px; }
+  .shot {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px;
+    background: #fafafb;
+    text-align: center;
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .shot img { max-width: 100%; height: auto; border-radius: 3px; display: block; }
+  .shot .todo { color: #c0392b; font-size: 13px; font-style: italic; }
+  .cmd {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    background: #14141a;
+    color: #9be7b8;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin: 6px 0 12px 17px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  footer.sig { margin-top: 40px; font-size: 12px; color: var(--muted); text-align: center; }
+
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; max-width: none; padding: 20mm 16mm; }
+    .evidence { page-break-inside: avoid; break-inside: avoid; }
+    .evidence + .evidence { page-break-before: always; break-before: page; }
+    h2.block { page-break-before: always; break-before: page; }
+    .cover { page-break-after: always; break-after: page; }
+    .cover + h2.block, #b1 { page-break-before: avoid; break-before: avoid; }
+    .shot img { max-height: 175mm; width: auto; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Arcanjo SA &bull; DevSecOps</div>
+    <h1>Checkpoint 04 &mdash; Evidências</h1>
+    <h2>Containerização do portal &bull; Docker + Docker Hub + AWS EC2</h2>
+    <table>
+      <tr><td class="k">Aluno</td><td>Gabriel Diegues Figueiredo Rocha</td></tr>
+      <tr><td class="k">RM</td><td>550788</td></tr>
+      <tr><td class="k">Turma</td><td>4ESPV</td></tr>
+      <tr><td class="k">Imagem</td><td>gabrieldiegues/cp04-arcanjo:cp04</td></tr>
+      <tr><td class="k">URL do portal</td><td>http://44.200.200.134</td></tr>
+      <tr><td class="k">Data</td><td>31/08/2026</td></tr>
+    </table>
+  </div>
+
+  <p class="no-print" style="background:#fff8e1;border:1px solid #f0d98a;padding:12px 16px;border-radius:6px;font-size:13px;">
+    <strong>Como usar:</strong> os <code>&lt;img&gt;</code> abaixo apontam para os nomes exatos dos
+    arquivos em <code>docs/prints/</code>. Onde aparecer o texto vermelho <em>"pendente"</em>, tire
+    o print e salve com o nome indicado. Depois abra este arquivo no Chrome →
+    <strong>Ctrl+P</strong> → <em>Salvar como PDF</em> →
+    <code>CP04_RM550788_Gabriel_Diegues.pdf</code>. Esta caixa não sai na impressão.
+  </p>
+
+  <!-- ================= BLOCO A ================= -->
+  <h2 class="block">Bloco A &mdash; Imagem Docker e Docker Hub</h2>
+
+  <div class="evidence" id="b1">
+    <h3 class="ev"><span class="ev-num">A1.</span> docker build sem erro</h3>
+    <p class="cap">Build da imagem a partir do Dockerfile terminando sem erro (naming to docker.io/gabrieldiegues/cp04-arcanjo:cp04).</p>
+    <div class="cmd">docker build -t gabrieldiegues/cp04-arcanjo:cp04 .</div>
+    <div class="shot"><img src="prints/build.png" alt="A1" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/build.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">A2.</span> Imagem local com a tag cp04</h3>
+    <p class="cap">docker images mostrando o repositório gabrieldiegues/cp04-arcanjo e a TAG cp04.</p>
+    <div class="cmd">docker images gabrieldiegues/cp04-arcanjo</div>
+    <div class="shot"><img src="prints/images.png" alt="A2" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/images.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">A3.</span> docker push concluído</h3>
+    <p class="cap">Envio da imagem para o Docker Hub terminando com o digest da tag cp04.</p>
+    <div class="cmd">docker login -u gabrieldiegues
+docker push gabrieldiegues/cp04-arcanjo:cp04</div>
+    <div class="shot"><img src="prints/push.png" alt="A3" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/push.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">A4.</span> Imagem publicada no Docker Hub, tag cp04</h3>
+    <p class="cap">Página hub.docker.com/r/gabrieldiegues/cp04-arcanjo — aba Tags com cp04 (linux/amd64) e o repositório visível publicamente.</p>
+    <div class="shot"><img src="prints/01.png" alt="A4" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/01.png — pendente'}))" /></div>
+  </div>
+
+  <!-- ================= BLOCO B ================= -->
+  <h2 class="block">Bloco B &mdash; Rede na AWS (VPC vpc-arcanjo · 10.0.0.0/24)</h2>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">B1.</span> Sub-rede pública na VPC</h3>
+    <p class="cap">subnet-arcanjo-pub (10.0.0.0/28), estado Available, dentro da vpc-arcanjo — a mesma VPC em que a EC2 foi lançada (ver B3/B4 e C1).</p>
+    <div class="shot"><img src="prints/08.png" alt="B1" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/08.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">B2.</span> Internet Gateway anexado à VPC</h3>
+    <p class="cap">igw-arcanjo com estado Attached à vpc-arcanjo — o mesmo IGW referenciado na rota 0.0.0.0/0 em B3.</p>
+    <div class="shot"><img src="prints/09-pt1.png" alt="B2" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/09-pt1.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">B3.</span> Tabela de rotas com saída para a internet</h3>
+    <p class="cap">rtb-arcanjo-pub na vpc-arcanjo: rota 0.0.0.0/0 → Internet Gateway (Active) e 10.0.0.0/24 → local.</p>
+    <div class="shot"><img src="prints/09-pt2.png" alt="B3" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/09-pt2.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">B4.</span> Sub-rede associada à tabela de rotas</h3>
+    <p class="cap">Aba "Associações de sub-rede" da rtb-arcanjo-pub com subnet-arcanjo-pub associada explicitamente — sem isso a rota 0.0.0.0/0 não vale para a sub-rede.</p>
+    <div class="shot"><img src="prints/09-pt3.png" alt="B4" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/09-pt3.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">B5.</span> Security Group controlando o tráfego</h3>
+    <p class="cap">gs-arcanjo — regras de entrada: HTTP 80/TCP de 0.0.0.0/0 (portal) e SSH 22/TCP restrito ao meu IP.</p>
+    <div class="shot"><img src="prints/10.png" alt="B5" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/10.png — pendente'}))" /></div>
+  </div>
+
+  <!-- ================= BLOCO C ================= -->
+  <h2 class="block">Bloco C &mdash; Container rodando na nuvem</h2>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">C1.</span> Instância EC2 em execução</h3>
+    <p class="cap">ec2-arcanjo-portal (t3.micro, Amazon Linux 2023) — estado Running, VPC vpc-arcanjo, subnet subnet-arcanjo-pub e Endereço IPv4 público 44.200.200.134.</p>
+    <div class="shot"><img src="prints/11.png" alt="C1" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/11.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">C2.</span> Container ativo na EC2 (via SSH)</h3>
+    <p class="cap">Sessão SSH em ec2-user@44.200.200.134: docker ps com portal-arcanjo "Up (healthy)", docker images com a tag cp04 e curl -I http://localhost retornando HTTP/1.1 200 OK.</p>
+    <div class="cmd">ssh -i labsuser.pem ec2-user@44.200.200.134
+docker ps
+docker images
+curl -I http://localhost</div>
+    <div class="shot"><img src="prints/12.png" alt="C2" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/12.png — pendente'}))" /></div>
+  </div>
+
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">C3.</span> Portal acessível pelo IP público da EC2</h3>
+    <p class="cap">Navegador com a barra de endereço em http://44.200.200.134 e a página do portal carregada — nome, RM (550788) e turma (4ESPV) legíveis. (Critério de 3,0 pontos.)</p>
+    <div class="shot"><img src="prints/13.png" alt="C3" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/13.png — pendente'}))" /></div>
+  </div>
+
+  <footer class="sig">
+    Gabriel Diegues Figueiredo Rocha &bull; RM 550788 &bull; 4ESPV &bull; CP04 &bull; FIAP
+  </footer>
+
+</div>
+</body>
+</html>

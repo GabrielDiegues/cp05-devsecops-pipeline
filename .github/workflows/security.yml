@@ -1,0 +1,63 @@
+name: Security Pipeline
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # Barreira 1: segredos no codigo e em todo o historico do git
+  gitleaks:
+    name: Gitleaks (segredos)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historico completo, para varrer todos os commits
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Barreira 2: SAST - codigo vulneravel (ex.: eval sobre entrada do usuario)
+  semgrep:
+    name: Semgrep (SAST)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep scan
+        run: semgrep scan --config p/javascript --config p/security-audit --error --metrics=off
+
+  # Barreira 3: CVE em imagem de container
+  trivy:
+    name: Trivy (imagem)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build da imagem
+        run: docker build -t cp05-arcanjo:${{ github.sha }} .
+      - name: Relatorio completo (CRITICAL e HIGH, informativo)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: cp05-arcanjo:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          format: table
+          output: trivy-report.txt
+          exit-code: '0'
+      - name: Mostrar relatorio
+        run: cat trivy-report.txt
+      - name: Guardar relatorio
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.txt
+      - name: Barreira (falha com CVE CRITICAL)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: cp05-arcanjo:${{ github.sha }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: '1'

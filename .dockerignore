@@ -1,0 +1,8 @@
+docs/
+*.pdf
+*.md
+.git/
+.github/
+.gitignore
+user-data.sh
+scratchpad/
