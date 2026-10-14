@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>CP04 — Evidências — RM 550788</title>
+<title>CP05 — Evidências — RM 550788</title>
 <style>
   :root { --accent: #e6155f; --ink: #14141a; --muted: #6b6b78; --line: #d9d9e0; }
   * { box-sizing: border-box; }
@@ -98,119 +98,104 @@
 
   <div class="cover">
     <div class="kicker">Arcanjo SA &bull; DevSecOps</div>
-    <h1>Checkpoint 04 &mdash; Evidências</h1>
-    <h2>Containerização do portal &bull; Docker + Docker Hub + AWS EC2</h2>
+    <h1>Checkpoint 05 &mdash; Evidências</h1>
+    <h2>O pipeline DevSecOps completo &bull; Gitleaks + Semgrep + Trivy</h2>
     <table>
       <tr><td class="k">Aluno</td><td>Gabriel Diegues Figueiredo Rocha</td></tr>
       <tr><td class="k">RM</td><td>550788</td></tr>
       <tr><td class="k">Turma</td><td>4ESPV</td></tr>
-      <tr><td class="k">Imagem</td><td>gabrieldiegues/cp04-arcanjo:cp04</td></tr>
-      <tr><td class="k">URL do portal</td><td>http://44.200.200.134</td></tr>
-      <tr><td class="k">Data</td><td>31/08/2026</td></tr>
+      <tr><td class="k">Repositório</td><td>github.com/GabrielDiegues/cp05-devsecops-pipeline</td></tr>
+      <tr><td class="k">Workflow</td><td>.github/workflows/security.yml</td></tr>
+      <tr><td class="k">Data</td><td>13/10/2026</td></tr>
     </table>
   </div>
 
-  <p class="no-print" style="background:#fff8e1;border:1px solid #f0d98a;padding:12px 16px;border-radius:6px;font-size:13px;">
-    <strong>Como usar:</strong> os <code>&lt;img&gt;</code> abaixo apontam para os nomes exatos dos
-    arquivos em <code>docs/prints/</code>. Onde aparecer o texto vermelho <em>"pendente"</em>, tire
-    o print e salve com o nome indicado. Depois abra este arquivo no Chrome →
-    <strong>Ctrl+P</strong> → <em>Salvar como PDF</em> →
-    <code>CP04_RM550788_Gabriel_Diegues.pdf</code>. Esta caixa não sai na impressão.
+  <h2 class="block">Visão geral &mdash; o pipeline</h2>
+  <p>
+    O workflow <code>security.yml</code> roda em todo <code>push</code> e <code>pull_request</code> e
+    tem três jobs independentes, cada um uma barreira. Na <code>main</code> os três passam; para provar
+    que as barreiras funcionam, cada uma recebeu um Pull Request de sabotagem que a faz falhar
+    (os PRs ficam abertos, sem merge).
   </p>
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">1</span> Pipeline verde na main</h3>
+    <p class="cap">Os três jobs (Gitleaks, Semgrep e Trivy) concluem com sucesso no código limpo.</p>
+    <div class="shot"><img src="prints/cp05-01-main-verde.png" alt="Run verde na main"></div>
+  </div>
 
-  <!-- ================= BLOCO A ================= -->
-  <h2 class="block">Bloco A &mdash; Imagem Docker e Docker Hub</h2>
-
-  <div class="evidence" id="b1">
-    <h3 class="ev"><span class="ev-num">A1.</span> docker build sem erro</h3>
-    <p class="cap">Build da imagem a partir do Dockerfile terminando sem erro (naming to docker.io/gabrieldiegues/cp04-arcanjo:cp04).</p>
-    <div class="cmd">docker build -t gabrieldiegues/cp04-arcanjo:cp04 .</div>
-    <div class="shot"><img src="prints/build.png" alt="A1" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/build.png — pendente'}))" /></div>
+  <h2 class="block">Barreira 1 &mdash; Gitleaks (segredos)</h2>
+  <p>
+    O <strong>Gitleaks</strong> varre o código e todo o histórico do git (<code>fetch-depth: 0</code>) atrás de
+    segredos, como chaves de API, tokens e senhas, usando regras de padrão e entropia. Isso importa porque um
+    segredo, uma vez commitado, fica no histórico mesmo que o arquivo seja apagado depois, exatamente o que
+    aconteceu com a chave vazada da Arcanjo. Na sabotagem (PR #1) adicionei <code>config/app.env</code> com uma
+    chave de API e uma senha falsas. O job falhou e o resumo aponta a regra <code>generic-api-key</code>, o commit,
+    o arquivo e as linhas 1 e 2, então o merge fica bloqueado antes de o segredo chegar à <code>main</code>.
+  </p>
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">2</span> PR #1 &mdash; job Gitleaks falha</h3>
+    <p class="cap">Apenas o Gitleaks fica vermelho; Semgrep e Trivy continuam verdes.</p>
+    <div class="shot"><img src="prints/cp05-02-pr1-checks.png" alt="Checks do PR 1"></div>
   </div>
 
   <div class="evidence">
-    <h3 class="ev"><span class="ev-num">A2.</span> Imagem local com a tag cp04</h3>
-    <p class="cap">docker images mostrando o repositório gabrieldiegues/cp04-arcanjo e a TAG cp04.</p>
-    <div class="cmd">docker images gabrieldiegues/cp04-arcanjo</div>
-    <div class="shot"><img src="prints/images.png" alt="A2" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/images.png — pendente'}))" /></div>
+    <h3 class="ev"><span class="ev-num">3</span> Gitleaks: segredo falso detectado</h3>
+    <p class="cap">Resumo do job: dois achados da regra generic-api-key em config/app.env.</p>
+    <div class="shot"><img src="prints/cp05-03-gitleaks.png" alt="Resumo do Gitleaks"></div>
+  </div>
+
+  <h2 class="block">Barreira 2 &mdash; Semgrep (SAST)</h2>
+  <p>
+    O <strong>Semgrep</strong> faz análise estática do código-fonte (SAST), sem executá-lo, comparando-o a regras
+    de segurança (aqui os conjuntos <code>p/javascript</code> e <code>p/security-audit</code>). Com <code>--error</code>,
+    qualquer achado bloqueante derruba o job. Na sabotagem (PR #2) criei <code>js/calc.js</code>, que passa
+    <code>location.hash</code>, controlado pelo usuário, direto para <code>eval()</code>. O Semgrep apontou a regra
+    <code>javascript.lang.security.detect-eval-with-expression</code>, que alerta para execução dinâmica de código
+    e risco de XSS, indicando a linha exata, e o job terminou com <em>exit code 1</em>.
+  </p>
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">4</span> PR #2 &mdash; job Semgrep falha</h3>
+    <p class="cap">Apenas o Semgrep fica vermelho; Gitleaks e Trivy continuam verdes.</p>
+    <div class="shot"><img src="prints/cp05-04-pr2-checks.png" alt="Checks do PR 2"></div>
   </div>
 
   <div class="evidence">
-    <h3 class="ev"><span class="ev-num">A3.</span> docker push concluído</h3>
-    <p class="cap">Envio da imagem para o Docker Hub terminando com o digest da tag cp04.</p>
-    <div class="cmd">docker login -u gabrieldiegues
-docker push gabrieldiegues/cp04-arcanjo:cp04</div>
-    <div class="shot"><img src="prints/push.png" alt="A3" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/push.png — pendente'}))" /></div>
+    <h3 class="ev"><span class="ev-num">5</span> Semgrep: eval apontado no código</h3>
+    <p class="cap">Log do job: 1 achado bloqueante em js/calc.js, linha com eval(expr).</p>
+    <div class="shot"><img src="prints/cp05-05-semgrep.png" alt="Log do Semgrep"></div>
+  </div>
+
+  <h2 class="block">Barreira 3 &mdash; Trivy (imagem de container)</h2>
+  <p>
+    O <strong>Trivy</strong> constrói a imagem do <code>Dockerfile</code> e a escaneia em busca de CVEs nos pacotes
+    do sistema operacional. O job tem dois passos: um relatório informativo (CRITICAL e HIGH, sem falhar), guardado
+    como artifact, e a barreira, que falha com qualquer CVE <strong>CRITICAL</strong> que já tenha correção
+    disponível (<code>ignore-unfixed</code>).
+  </p>
+  <p>
+    <strong>Análise do resultado.</strong> A base original do CP04, <code>nginx:1.27-alpine</code> (Alpine 3.21),
+    tem 2 CVEs CRITICAL, os dois a mesma falha no OpenSSL: <strong>CVE-2026-31789</strong>, um estouro de buffer
+    de heap em sistemas 32 bits, nos pacotes <code>libcrypto3</code> e <code>libssl3</code>, versão instalada
+    <code>3.3.3-r0</code>, corrigida na <code>3.3.7-r0</code>. O mesmo scan também lista dezenas de vulnerabilidades
+    HIGH, MEDIUM e LOW. Como há correção, a barreira reprovou o PR #3. A correção é trocar a base para
+    <code>nginx:1.30-alpine</code> (Alpine 3.24), com 0 CVEs CRITICAL, versão que está na <code>main</code> e passa.
+    É um risco real porque o OpenSSL está em toda imagem baseada em Alpine. Como a tag é fixa, a imagem não se atualiza
+    sozinha, e é o scan automático a cada commit que avisa quando uma base envelhece.
+  </p>
+  <div class="evidence">
+    <h3 class="ev"><span class="ev-num">6</span> PR #3 &mdash; job Trivy falha</h3>
+    <p class="cap">Imagem com base nginx:1.27-alpine reprovada; Gitleaks e Semgrep continuam verdes.</p>
+    <div class="shot"><img src="prints/cp05-06-pr3-checks.png" alt="Checks do PR 3"></div>
   </div>
 
   <div class="evidence">
-    <h3 class="ev"><span class="ev-num">A4.</span> Imagem publicada no Docker Hub, tag cp04</h3>
-    <p class="cap">Página hub.docker.com/r/gabrieldiegues/cp04-arcanjo — aba Tags com cp04 (linux/amd64) e o repositório visível publicamente.</p>
-    <div class="shot"><img src="prints/01.png" alt="A4" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/01.png — pendente'}))" /></div>
+    <h3 class="ev"><span class="ev-num">7</span> Trivy: scan da imagem com CVE CRITICAL</h3>
+    <p class="cap">Passo de barreira: o relatório mostra 2 vulnerabilidades CRITICAL na imagem (Alpine 3.21), e o step termina em erro.</p>
+    <div class="shot"><img src="prints/cp05-07-trivy.png" alt="Log do Trivy"></div>
   </div>
 
-  <!-- ================= BLOCO B ================= -->
-  <h2 class="block">Bloco B &mdash; Rede na AWS (VPC vpc-arcanjo · 10.0.0.0/24)</h2>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">B1.</span> Sub-rede pública na VPC</h3>
-    <p class="cap">subnet-arcanjo-pub (10.0.0.0/28), estado Available, dentro da vpc-arcanjo — a mesma VPC em que a EC2 foi lançada (ver B3/B4 e C1).</p>
-    <div class="shot"><img src="prints/08.png" alt="B1" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/08.png — pendente'}))" /></div>
-  </div>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">B2.</span> Internet Gateway anexado à VPC</h3>
-    <p class="cap">igw-arcanjo com estado Attached à vpc-arcanjo — o mesmo IGW referenciado na rota 0.0.0.0/0 em B3.</p>
-    <div class="shot"><img src="prints/09-pt1.png" alt="B2" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/09-pt1.png — pendente'}))" /></div>
-  </div>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">B3.</span> Tabela de rotas com saída para a internet</h3>
-    <p class="cap">rtb-arcanjo-pub na vpc-arcanjo: rota 0.0.0.0/0 → Internet Gateway (Active) e 10.0.0.0/24 → local.</p>
-    <div class="shot"><img src="prints/09-pt2.png" alt="B3" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/09-pt2.png — pendente'}))" /></div>
-  </div>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">B4.</span> Sub-rede associada à tabela de rotas</h3>
-    <p class="cap">Aba "Associações de sub-rede" da rtb-arcanjo-pub com subnet-arcanjo-pub associada explicitamente — sem isso a rota 0.0.0.0/0 não vale para a sub-rede.</p>
-    <div class="shot"><img src="prints/09-pt3.png" alt="B4" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/09-pt3.png — pendente'}))" /></div>
-  </div>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">B5.</span> Security Group controlando o tráfego</h3>
-    <p class="cap">gs-arcanjo — regras de entrada: HTTP 80/TCP de 0.0.0.0/0 (portal) e SSH 22/TCP restrito ao meu IP.</p>
-    <div class="shot"><img src="prints/10.png" alt="B5" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/10.png — pendente'}))" /></div>
-  </div>
-
-  <!-- ================= BLOCO C ================= -->
-  <h2 class="block">Bloco C &mdash; Container rodando na nuvem</h2>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">C1.</span> Instância EC2 em execução</h3>
-    <p class="cap">ec2-arcanjo-portal (t3.micro, Amazon Linux 2023) — estado Running, VPC vpc-arcanjo, subnet subnet-arcanjo-pub e Endereço IPv4 público 44.200.200.134.</p>
-    <div class="shot"><img src="prints/11.png" alt="C1" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/11.png — pendente'}))" /></div>
-  </div>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">C2.</span> Container ativo na EC2 (via SSH)</h3>
-    <p class="cap">Sessão SSH em ec2-user@44.200.200.134: docker ps com portal-arcanjo "Up (healthy)", docker images com a tag cp04 e curl -I http://localhost retornando HTTP/1.1 200 OK.</p>
-    <div class="cmd">ssh -i labsuser.pem ec2-user@44.200.200.134
-docker ps
-docker images
-curl -I http://localhost</div>
-    <div class="shot"><img src="prints/12.png" alt="C2" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/12.png — pendente'}))" /></div>
-  </div>
-
-  <div class="evidence">
-    <h3 class="ev"><span class="ev-num">C3.</span> Portal acessível pelo IP público da EC2</h3>
-    <p class="cap">Navegador com a barra de endereço em http://44.200.200.134 e a página do portal carregada — nome, RM (550788) e turma (4ESPV) legíveis. (Critério de 3,0 pontos.)</p>
-    <div class="shot"><img src="prints/13.png" alt="C3" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'todo',textContent:'prints/13.png — pendente'}))" /></div>
-  </div>
-
-  <footer class="sig">
-    Gabriel Diegues Figueiredo Rocha &bull; RM 550788 &bull; 4ESPV &bull; CP04 &bull; FIAP
-  </footer>
-
+  <footer class="sig">Gabriel Diegues Figueiredo Rocha &bull; RM 550788 &bull; 4ESPV &bull; CP05 &mdash; DevSecOps and Cloud Computing &bull; FIAP</footer>
 </div>
+
 </body>
 </html>
