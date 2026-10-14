@@ -39,7 +39,7 @@ jobs:
       - name: Build da imagem
         run: docker build -t cp05-arcanjo:${{ github.sha }} .
       - name: Relatorio completo (CRITICAL e HIGH, informativo)
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: cp05-arcanjo:${{ github.sha }}
           severity: CRITICAL,HIGH
@@ -54,7 +54,7 @@ jobs:
           name: trivy-report
           path: trivy-report.txt
       - name: Barreira (falha com CVE CRITICAL)
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: cp05-arcanjo:${{ github.sha }}
           severity: CRITICAL
